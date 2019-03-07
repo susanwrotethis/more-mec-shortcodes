@@ -4,7 +4,7 @@ Plugin Name: More MEC Shortocdes
 Plugin URI: https://github.com/susanwrotethis/more-mec-shortcodes
 GitHub Plugin URI: https://github.com/susanwrotethis/more-mec-shortcodes
 Description: Extends Modern Events Calendar Lite by adding a shortcode to display an events list in a non-caledar format. The shortcode is for the specific case of classes or activities posted as recurring events, one or more days a week over a series of several weeks.
-Version: 1.0
+Version: 1.1
 Author: Susan Walker
 Author URI: https://susanwrotethis.com
 License: GPL v2 or later
@@ -80,7 +80,8 @@ function swt_mec_set_dow_name( &$item, $key )
 		__( 'Wednesdays', 'swt-mec' ), 
 		__( 'Thursdays', 'swt-mec' ), 
 		__( 'Fridays', 'swt-mec' ), 
-		__( 'Saturdays', 'swt-mec' ) 
+		__( 'Saturdays', 'swt-mec' ),
+		__( 'Sundays', 'swt-mec' ) // Correct for MEC setting Sunday value as 7 
 	);
 	$item = $dow[$item];
 }
