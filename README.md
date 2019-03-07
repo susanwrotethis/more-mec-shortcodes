@@ -108,6 +108,10 @@ See the Modern Events Calendar Lite plugin in [the WordPress plugins repository]
 
 ## Changelog
 
-### 0.1
+### 1.0
 
 * New release
+
+### 1.1
+
+* Fix Sunday events not displaying day of week. Compensates for MEC setting the value for Sunday as 7 rather than 9.
