@@ -3,8 +3,8 @@
 Plugin Name: More MEC Shortocdes
 Plugin URI: https://github.com/susanwrotethis/more-mec-shortcodes
 GitHub Plugin URI: https://github.com/susanwrotethis/more-mec-shortcodes
-Description: Extends Modern Events Calendar Lite by adding a shortcode to display an events list in a non-caledar format. The shortcode is for the specific case of classes or activities posted as recurring events, one or more days a week over a series of several weeks.
-Version: 1.1
+Description: Extends Modern Events Calendar Lite by adding shortcodes to display an events list in a non-caledar format. The shortcode is for the specific case of classes or activities posted as recurring events, one or more days a week over a series of several weeks.
+Version: 1.2
 Author: Susan Walker
 Author URI: https://susanwrotethis.com
 License: GPL v2 or later
@@ -36,9 +36,9 @@ function swt_mec_set_noon_midnight( $seconds )
 {
 	switch( $seconds ) {
 		case 0:
-			return 'midnight';
+			return __( 'midnight', 'swt-mec' );
 		case 43200:
-			return 'noon';
+			return __( 'noon', 'swt-mec' );
 		default:
 			return date( 'g:i a', $seconds );
 	}
@@ -93,21 +93,22 @@ function swt_mec_parse_days( $repeat )
 		return '';
 	}
 	
+	$conj = __( ' and ', 'swt-mec' );
 	$days = $repeat['certain_weekdays'];
 	array_walk( $days, 'swt_mec_set_dow_name' );
 	
 	switch( count($days) ) {
 		
 		case 1:
-			return $days[0].', ';
+			return $days[0];
 			
 		case 2:
-			return $days[0].' and '.$days[1].', ';
+			return $days[0].$conj.$days[1];
 			
 		default:
 			$last = array_pop( $days );
 			$all = implode( ', ', $days );
-			return $all.' and '.$last.', ';
+			return $all.$conj.$last;
 			
 	} // End switch
 }
@@ -117,19 +118,69 @@ function swt_mec_format_recurring( $date, $repeat )
 {
 	$initial = strtotime( $date );
 
+	// Return the start date for one-time recurring?
 	$start = date( 'F j', $initial );
+	if ( '1' == $repeat ) {
+		return $start;
+	}
+	
 	$final = $initial+(($repeat-1)*604800); // add on # of weeks in seconds
 	$end = date( 'F j', $final );
 	
-	return '('.$start.'-'.$end.')';
+	return $start.'-'.$end;
 }
 
-// SHORTCODE FUNCTIONS BEGIN HERE ////////////////////////////////////////////////////////
-// Shortcode to list events by category.
-function swt_mec_list_events( $atts, $content=null )
+// SHORTCODE EVENTS LIST FORMAT FUNCTIONS BEGIN HERE /////////////////////////////////////
+// Concat and return the event data in the default style.
+function swt_mec_default_style( $data )
 {
+	$for = __( 'for', 'swt-mec' );
+	$weeks = __( 'weeks', 'swt-mec' );
+	$week = __( 'week', 'swt-mec' );
+	$btn = __( 'Sign Up', 'swt-mec' );
+	
+	$w = ( $data['weeks'] == '1' ? $week : $weeks );
+	
+	$a = sprintf( '<h3>%s</h3>', $data['title'] );
+	$b = sprintf( '<div class="event-session in-%s">', $data['cslug'] );
+	$c = sprintf( '<div class="event-details"><p>%1$s, %2$s, %3$s', $data['days'], $data['times'], $data['loc'] );
+	$d = sprintf( '%s<br />', $data['addr'] );
+	$e = sprintf( '%1$s %2$s %3$s %4$s ', $data['cost'], $for, $data['weeks'], $w );
+	$f = sprintf( '(%s)</p></div>', $data['dates'] );
+	$g = sprintf( '<div class="event-signup"><a class="gobutton" href="%s">', $data['href'] );
+	$h = sprintf( '%1$s<span class="screen-reader-text">%2$s %3$s</span></a></div>', $btn, $for, $data['title'] );
+	return apply_filters( 'swt_mec_default_style', $a.$b.$c.$d.$e.$f.$g.$h."</div>\n", $data );
+}
+
+// Concat and return the event data in the basic list style.
+function swt_mec_list_style( $data )
+{
+	$for = __( 'for', 'swt-mec' );
+	$weeks = __( 'weeks', 'swt-mec' );
+	$week = __( 'week', 'swt-mec' );
+	$btn = __( 'Sign Up', 'swt-mec' );
+	
+	$w = ( $data['weeks'] == '1' ? $week : $weeks );
+	
+	$a = sprintf( '<li class="event-session in-%s">', $data['cslug'] );
+	$b = sprintf( '<p class="event-list-title"><strong>%s</strong><br />', $data['title'] );
+	$c = sprintf( '%1$s, %2$s, %3$s', $data['days'], $data['times'], $data['loc'] );
+	$d = sprintf( '%s<br />', $data['addr'] );
+	$e = sprintf( '%1$s %2$s %3$s %4$s ', $data['cost'], $for, $data['weeks'], $w );
+	$f = sprintf( '(%s)</p>', $data['dates'] );
+	$g = sprintf( '<div class="event-signup"><a class="gobutton" href="%s">', $data['href'] );
+	$h = sprintf( '%1$s<span class="screen-reader-text">%2$s %3$s</span></a></div>', $btn, $for, $data['title'] );
+	return apply_filters( 'swt_mec_list_style', $a.$b.$c.$d.$e.$f.$g.$h."</li>\n", $data );
+}
+
+// SHORTCODE PROCESSING FUNCTION BEGINS HERE /////////////////////////////////////////////
+// Get format argument from wrapper function and assemble the list.
+function swt_mec_list_events( $format = 'default' )
+{
+	// Setup
 	global $post;
 	
+	$format = ( $format == 'list' ? 'list' : 'default' );
 	$o_loop = ''; // Outer loop contains full string to be returned
 	
 	// Get event category terms
@@ -180,55 +231,53 @@ function swt_mec_list_events( $atts, $content=null )
 			
 				setup_postdata( $post );
 				
-				// Event name
-				$title = get_the_title();
-				$string = '<h3>'.$title.'</h3><div class="event-session in-'.$c_slug.'">';
+				// Set the array to collect formatted event data
+				$data = array();
 				
-				// Days of event
+				// Category slug and event title
+				$data['term'] = $term;
+				$data['cslug'] = $c_slug;
+				$data['title'] = get_the_title();
+				
+				// Days of event, start and end times of sesson
 				$repeat = maybe_unserialize( $post->mec_repeat );
-				$string .= '<div class="event-details"><p>'.swt_mec_parse_days( $repeat );
+				$data['days'] = swt_mec_parse_days( $repeat );
+				$data['times'] = str_replace( ':00', '', swt_mec_start_end_times( $post ) );
 				
-				// Start and end times of session
-				$string .= str_replace( ':00', '', swt_mec_start_end_times( $post ) ).', ';
-				
-				// Event location (a taxonomy term)
+				// Event location (a taxonomy term) and address
 				$location = get_term_by( 'id', $post->mec_location_id, 'mec_location' );
-				$string .= trim( $location->name );
-				
-				// Address (term meta)
+				$data['loc'] = trim( $location->name );
+				$data['addr'] = '';
 				if ( $address = get_term_meta( $location->term_id, 'address', true ) ) {
-					$string .= ', '.trim( $address );
+					$data['addr'] = ', '.trim( $address );
 				}
-				$string .= '<br />';
 				
-				// Cost
-				$string .= trim( $post->mec_cost ).' for ';
-				
-				// Number of sessions for this class
-				$string .= $repeat['end_at_occurrences'].' weeks ';
-				
-				// concat the start and end dates
+				// Cost, number of sessions, start and end dates, signup URL
+				$data['cost'] = trim( $post->mec_cost );
+				$data['weeks'] = $repeat['end_at_occurrences'];
 				$start = trim( $post->mec_start_date );
-				$string .= swt_mec_format_recurring( $start, $repeat['end_at_occurrences'] );
-				
-				// Escape string built so far
-				//$string = esc_attr( $string );
-				$button_text = __( 'Sign Up', 'swt-mec' );
-				
-				// Signup URL with button class
-				$string .= '</p></div><div class="event-signup"><a class="gobutton"';
-				$string .= ' href="'.urlencode( trim( $post->mec_read_more ) ).'">';
-				$string .= $button_text.'<span class="screen-reader-text"> ';
-				$string .= sprintf( __('for %s', 'swt-mec' ), $title );
-				$string .= "</span></a></div></div>\n";
+				$data['dates'] = swt_mec_format_recurring( $start, $repeat['end_at_occurrences'] );
+				$data['href'] = trim( $post->mec_read_more );
              
-            	// Pass this iteration's string before resetting for next
-            	$i_loop .= $string;
-            	
+            	// Format data and pass to loop
+            	switch($format) {
+            		case 'list':
+            			$i_loop .= swt_mec_list_style( $data );
+            			break;
+            		default:
+            			$i_loop .= swt_mec_default_style( $data );
+            	} // End switch
+            		
         	endforeach; // Next post
         	
-        		// Concat section info and related iterations
-        		$o_loop .= $section.$i_loop;
+        		// Pass section info and entries to outer loop
+            	switch($format) {
+            		case 'list':
+            			$o_loop .= $section.'<ul class="event-list">'.$i_loop.'</ul>';
+            			break;
+            		default:
+            			$o_loop .= $section.$i_loop;
+            	} // End switch
         	
         	// Reset the query
         	wp_reset_postdata();
@@ -238,4 +287,18 @@ function swt_mec_list_events( $atts, $content=null )
 	
 	return $o_loop;
 }
-add_shortcode( 'custom-event-list', 'swt_mec_list_events');
+
+// SHORTCODE FUNCTIONS BEGIN HERE ////////////////////////////////////////////////////////
+// Returns the series of events formatted in div tags.
+function swt_mec_default_format()
+{
+	return swt_mec_list_events( 'default' );
+}
+add_shortcode( 'custom-event-list', 'swt_mec_default_format');
+
+// Returns the series of events as unordered lists for each category.
+function swt_mec_list_format()
+{
+	return swt_mec_list_events( 'list' );
+}
+add_shortcode( 'custom-event-ul', 'swt_mec_list_format');
