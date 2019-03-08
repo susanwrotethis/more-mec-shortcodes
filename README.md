@@ -4,7 +4,7 @@ This plugin was written for a small business offering series of classes for chil
 
 ## Description
 
-Extends Modern Events Calendar Lite by adding a shortcode to display an events list in a non-caledar format. The shortcode is for the specific case of classes or activities posted as recurring events, one or more days a week over a series of several weeks.
+Extends Modern Events Calendar Lite by adding shortcodes to display an events list in a non-caledar format. The shortcode is for the specific case of classes or activities posted as recurring events, one or more days a week over a series of several weeks.
 
 **Features**
 
@@ -37,11 +37,13 @@ The shortcode will display all non-private published events assigned a category,
 
 A number of fields are not used in this format, including the event content, the excerpt, tags, event label, event color, featured image, organizers and the more info link.
 
-Single events, all-day events, the hiding of times or locations and hourly schedule information is ignored. It assumes that Repeat is set to Certain Weekdays and the After field is used to set when the event stops repeating.
+Single events, all-day events, the hiding of times or locations and hourly schedule information are ignored. The plugin assumes that Repeat is set to Certain Weekdays and the After field is used to set when the event stops repeating.
 
 Categories cannot be excluded.
 
-There is only one layout format. While missing values for the fields that are used should not break the site, the results may not be pretty.
+While missing values for the fields that are used should not break the site, the results may not be pretty.
+
+There is no pagination. The shortcode is intended for short lists.
 
 ## Installation
 
@@ -56,9 +58,21 @@ Download the current release of this plugin as a zip file. Make sure the file is
 
 This plugin has no settings. It adds WordPress core's Menu Order setting to events to provide finer-grained control over the order of listings as they appear in the menu.
 
-If you have set up Modern Events Calendar Lite and added some recurring events, all you need to do is add the following shortcode to a page:
+If you have set up Modern Events Calendar Lite and added some recurring events, all you need to do is add one of the shortcodes to a page.
+
+For events as paragraphs with event titles in H3 tags:
 
 [custom-event-list]
+
+For events as unordered lists with event title in the list item:
+
+[custom-event-ul]
+
+## Filter Hooks
+
+This plugin has two filter hooks, **swt_mec_default_style** and **swt_mec_list_style**.
+
+Both filters allow for complete filtering of an events entry after it has been formatted. The formatted string for the entry and the array of data used to build it are passed as parameters.
 
 ## Frequently Asked Questions
 
@@ -83,6 +97,10 @@ If there are still published events in the website's database, this plugin will 
 **Will the menu order field affect the calendar's behavior elsewhere?**
 
 The field's addition should have no effect on Modern Events Calendar.
+
+**What if I also have single events to display?**
+
+Check the Event Repeating checkbox, select Certain Weekays and check the day or days. For end repeat, choose After and set 1 as the value.
 
 **Does this plugin have a Gutenberg block?**
 
@@ -115,3 +133,10 @@ See the Modern Events Calendar Lite plugin in [the WordPress plugins repository]
 ### 1.1
 
 * Fix Sunday events not displaying day of week. Compensates for MEC setting the value for Sunday as 7 rather than 9.
+
+### 1.2
+
+* Add a second shortcode to display events in unordered lists.
+* Refactor code to support the development of additional shortcodes for different formats.
+* Added filter hooks to access the events for additional formatting.
+* Update the translation template.
