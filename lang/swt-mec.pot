@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: More MEC Shortocdes\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-07 08:10+0000\n"
+"POT-Creation-Date: 2019-03-08 22:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -15,24 +15,31 @@ msgstr ""
 "X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Version: 2.2.0; wp-5.1"
 
+#: more-mec-shortcodes.php:96
+msgid " and "
+msgstr ""
+
 #. Description of the plugin
 msgid ""
-"Extends Modern Events Calendar Lite by adding a shortcode to display an "
+"Extends Modern Events Calendar Lite by adding shortcodes to display an "
 "events list in a non-caledar format. The shortcode is for the specific case "
 "of classes or activities posted as recurring events, one or more days a week "
 "over a series of several weeks."
 msgstr ""
 
-#: more-mec-shortcodes.php:217
-#, php-format
-msgid "for %s"
+#: more-mec-shortcodes.php:137 more-mec-shortcodes.php:158
+msgid "for"
 msgstr ""
 
-#: more-mec-shortcodes.php:78
+#: more-mec-shortcodes.php:82
 msgid "Fridays"
 msgstr ""
 
-#: more-mec-shortcodes.php:74
+#: more-mec-shortcodes.php:39
+msgid "midnight"
+msgstr ""
+
+#: more-mec-shortcodes.php:78
 msgid "Mondays"
 msgstr ""
 
@@ -40,26 +47,38 @@ msgstr ""
 msgid "More MEC Shortocdes"
 msgstr ""
 
-#: more-mec-shortcodes.php:79
+#: more-mec-shortcodes.php:41
+msgid "noon"
+msgstr ""
+
+#: more-mec-shortcodes.php:83
 msgid "Saturdays"
 msgstr ""
 
-#: more-mec-shortcodes.php:211
+#: more-mec-shortcodes.php:140 more-mec-shortcodes.php:161
 msgid "Sign Up"
 msgstr ""
 
-#: more-mec-shortcodes.php:73
+#: more-mec-shortcodes.php:77 more-mec-shortcodes.php:84
 msgid "Sundays"
 msgstr ""
 
-#: more-mec-shortcodes.php:77
+#: more-mec-shortcodes.php:81
 msgid "Thursdays"
 msgstr ""
 
-#: more-mec-shortcodes.php:75
+#: more-mec-shortcodes.php:79
 msgid "Tuesdays"
 msgstr ""
 
-#: more-mec-shortcodes.php:76
+#: more-mec-shortcodes.php:80
 msgid "Wednesdays"
+msgstr ""
+
+#: more-mec-shortcodes.php:139 more-mec-shortcodes.php:160
+msgid "week"
+msgstr ""
+
+#: more-mec-shortcodes.php:138 more-mec-shortcodes.php:159
+msgid "weeks"
 msgstr ""
